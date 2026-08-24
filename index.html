@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Web Iceberg — Deep Web, Dark Web & Tor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20260825k" />
+</head>
+<body>
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="fog-overlay" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <header class="top-bar">
+    <div class="brand">
+      <span class="brand-mark"></span>
+      <span class="brand-text">WEB ICEBERG</span>
+    </div>
+    <div class="depth-meter" aria-label="Depth through the iceberg">
+      <div class="depth-track">
+        <div class="depth-fill" id="depthFill"></div>
+        <div class="depth-marker" id="depthMarker"></div>
+      </div>
+      <div class="depth-labels">
+        <span>SURFACE</span>
+        <span>ABYSS</span>
+      </div>
+    </div>
+    <div class="slide-counter"><span id="slideNum">01</span> / <span id="slideTotal">12</span></div>
+  </header>
+
+  <main class="deck" id="deck">
+    <!-- 01 Hero -->
+    <section class="slide active" data-depth="0" data-theme="surface">
+      <div class="slide-inner">
+        <p class="eyebrow">A beginner story · iceberg edition</p>
+        <h1 class="hero-title">
+          <span class="line">Dive into the</span>
+          <span class="line accent glitch" id="heroGlitch" data-text="Iceberg">Iceberg</span>
+        </h1>
+        <p class="lede">
+          Most of the internet is hidden beneath the surface.
+          See what <strong class="hi">you</strong> do on real-like websites at every layer:
+          Surface → Deep → Dark — and the dangers waiting below.
+        </p>
+        <div class="cta-row">
+          <button class="btn primary" data-next>Start your dive ↓</button>
+          <span class="hint">Use ← → or scroll</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 Iceberg map -->
+    <section class="slide" data-depth="0.08" data-theme="surface">
+      <div class="slide-inner wide">
+        <p class="eyebrow">Your map</p>
+        <h2>The internet as an iceberg</h2>
+        <p class="lede">Three layers. Watch your path light up from tip to tip.</p>
+        <div class="size-bars" aria-hidden="true">
+          <div class="size-bar tip"><i style="--w:8%"></i><span>Surface ~4%</span></div>
+          <div class="size-bar mid"><i style="--w:90%"></i><span>Deep ~90%+</span></div>
+          <div class="size-bar deep"><i style="--w:12%"></i><span>Dark ~1–2%</span></div>
+        </div>
+        <div class="journey-path" aria-hidden="true">
+          <div class="jp-step tip on" style="--i:0">
+            <div class="jp-dot"></div>
+            <div class="jp-card">
+              <strong>1 · Surface</strong>
+              <span>Google, Wiki, YouTube</span>
+            </div>
+          </div>
+          <div class="jp-line"></div>
+          <div class="jp-step mid" style="--i:1">
+            <div class="jp-dot"></div>
+            <div class="jp-card">
+              <strong>2 · Deep Web</strong>
+              <span>Gmail, Bank, Netflix</span>
+            </div>
+          </div>
+          <div class="jp-line"></div>
+          <div class="jp-step deep" style="--i:2">
+            <div class="jp-dot warn"></div>
+            <div class="jp-card warn">
+              <strong>3 · Dark Web</strong>
+              <span>Tor + .onion (caution!)</span>
+            </div>
+          </div>
+        </div>
+        <div class="iceberg-legend compact">
+          <article class="layer-card tip" style="--d:0"><h3>~4%</h3><p>Surface — searchable</p></article>
+          <article class="layer-card mid" style="--d:1"><h3>~90%+</h3><p>Deep — login walls</p></article>
+          <article class="layer-card deep" style="--d:2"><h3>~1–2%</h3><p>Dark — special access</p></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 Surface -->
+    <section class="slide" data-depth="0.14" data-theme="surface">
+      <div class="slide-inner split">
+        <div>
+          <p class="eyebrow">Stage 1 · Surface Web</p>
+          <h2>You open Google</h2>
+          <p class="lede">
+            Anything a search engine can find lives on the <em>tip</em>.
+            No password needed — public pages anyone can visit.
+          </p>
+          <ul class="story-beats">
+            <li class="beat" style="--i:0"><span>09:12</span> You search “best thin crust pizza near me”</li>
+            <li class="beat" style="--i:1"><span>09:14</span> You read a Wikipedia page on sourdough</li>
+            <li class="beat" style="--i:2"><span>09:20</span> You watch a YouTube recipe video</li>
+          </ul>
+        </div>
+        <div class="demo-stage">
+          <div class="browser-live surface-anim">
+            <div class="chrome">
+              <div class="browser-dots"><i></i><i></i><i></i></div>
+              <div class="url-bar"><span class="lock">🔒</span> <span class="url-type" data-type="https://www.google.com/search?q=pizza"></span></div>
+            </div>
+            <div class="page-body">
+              <div class="g-logo">Search</div>
+              <div class="g-query">
+                <span class="typed-query">best thin crust pizza near me</span><i class="caret"></i>
+              </div>
+              <div class="g-results">
+                <article class="g-hit" style="--i:0">
+                  <div class="g-url">slicehaven.example · Reviews</div>
+                  <h4>Slice Haven — Open until 11pm</h4>
+                  <p>4.8★ · Thin crust specialists…</p>
+                </article>
+                <article class="g-hit" style="--i:1">
+                  <div class="g-url">en.wikipedia.org · Sourdough</div>
+                  <h4>Sourdough — Wikipedia</h4>
+                  <p>Bread made by fermentation of dough…</p>
+                </article>
+                <article class="g-hit" style="--i:2">
+                  <div class="g-url">youtube.com · Watch</div>
+                  <h4>10-Minute Crispy Pizza (Home Oven)</h4>
+                  <p>2.1M views · Cooking Channel</p>
+                </article>
+              </div>
+            </div>
+            <div class="layer-badge ok">SURFACE · Public &amp; indexed</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 Deep: email -->
+    <section class="slide" data-depth="0.32" data-theme="deep">
+      <div class="slide-inner split">
+        <div>
+          <p class="eyebrow">Stage 2a · Deep Web</p>
+          <h2>You check SecureMail</h2>
+          <p class="lede">
+            Real-like example: your private inbox. Search engines don’t list your emails —
+            they’re behind a login. That’s the Deep Web: huge, normal, not “dark.”
+          </p>
+          <ul class="story-beats">
+            <li class="beat" style="--i:0"><span>10:02</span> You open mail.example.com</li>
+            <li class="beat" style="--i:1"><span>10:03</span> You type email + password</li>
+            <li class="beat" style="--i:2"><span>10:04</span> Your inbox unlocks — still Deep Web</li>
+          </ul>
+        </div>
+        <div class="demo-stage">
+          <div class="browser-live deep-anim">
+            <div class="chrome">
+              <div class="browser-dots"><i></i><i></i><i></i></div>
+              <div class="url-bar"><span class="lock">🔒</span> mail.example.com</div>
+            </div>
+            <div class="page-body login-scene">
+              <div class="login-card">
+                <div class="brand-mini">SecureMail</div>
+                <label>Email<input value="you@example.com" readonly /></label>
+                <label>Password
+                  <div class="pw-row">
+                    <span class="pw-dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+                  </div>
+                </label>
+                <button class="fake-btn" type="button">Sign in</button>
+                <div class="lock-burst" aria-hidden="true"></div>
+              </div>
+              <div class="inbox-reveal">
+                <div class="inbox-row"><b>Campus Portal</b><span>Your tuition receipt</span></div>
+                <div class="inbox-row"><b>NorthStar Bank</b><span>Statement ready</span></div>
+                <div class="inbox-row"><b>StreamFlix</b><span>New episode tonight</span></div>
+              </div>
+            </div>
+            <div class="layer-badge deep">DEEP WEB · Behind login</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 Deep: bank + streaming -->
+    <section class="slide" data-depth="0.42" data-theme="deep">
+      <div class="slide-inner wide">
+        <p class="eyebrow">Stage 2b · More Deep Web stops</p>
+        <h2>Your private apps</h2>
+        <p class="lede">Same layer, different doors. Watch both unlock.</p>
+        <div class="dual-demos">
+          <div class="browser-live bank-anim">
+            <div class="chrome">
+              <div class="browser-dots"><i></i><i></i><i></i></div>
+              <div class="url-bar"><span class="lock">🔒</span> bank.northstar.example</div>
+            </div>
+            <div class="page-body bank-ui">
+              <div class="bank-header">NorthStar Bank</div>
+              <div class="balance-card">
+                <span>Checking ·••• 4281</span>
+                <strong class="count-up" data-count="1842.50">$0.00</strong>
+              </div>
+              <div class="tx-list">
+                <div class="tx"><span>Campus Café</span><b>-$6.40</b></div>
+                <div class="tx"><span>Payday</span><b class="pos">+$420.00</b></div>
+                <div class="tx"><span>StreamFlix</span><b>-$15.99</b></div>
+              </div>
+            </div>
+            <div class="layer-badge deep">DEEP · Banking</div>
+          </div>
+          <div class="browser-live stream-anim">
+            <div class="chrome">
+              <div class="browser-dots"><i></i><i></i><i></i></div>
+              <div class="url-bar"><span class="lock">🔒</span> watch.streamflix.example</div>
+            </div>
+            <div class="page-body stream-ui">
+              <div class="stream-hero">
+                <div class="play-pulse"></div>
+                <span>Continue: Ocean Docs S2</span>
+              </div>
+              <div class="stream-row">
+                <i></i><i></i><i></i><i></i>
+              </div>
+            </div>
+            <div class="layer-badge deep">DEEP · Streaming</div>
+          </div>
+        </div>
+        <div class="callout">
+          <strong>Your rule of thumb:</strong> If you need a password (or the page is private to you), you’re usually in the Deep Web — not the Dark Web.
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 Dark intro -->
+    <section class="slide" data-depth="0.58" data-theme="dark">
+      <div class="slide-inner split">
+        <div>
+          <p class="eyebrow">Stage 3 · Dark Web (concept)</p>
+          <h2>You hear about .onion</h2>
+          <p class="lede">
+            The Dark Web is a <em>tiny</em> slice that is hidden on purpose.
+            Normal Chrome/Safari can’t open it. Addresses often end in <code>.onion</code>
+            and need software like the Tor Browser.
+          </p>
+          <ul class="story-beats">
+            <li class="beat" style="--i:0"><span>Note</span> Not on Google’s results</li>
+            <li class="beat" style="--i:1"><span>Note</span> Needs Tor (or similar)</li>
+            <li class="beat" style="--i:2"><span>Note</span> Used for privacy — and sometimes misused</li>
+          </ul>
+          <div class="tor-history">
+            <div class="th-logo" aria-hidden="true">
+              <svg viewBox="0 0 120 128" role="img" aria-label="Tor onion logo">
+                <defs>
+                  <linearGradient id="torPurple" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#b57fda"/>
+                    <stop offset="1" stop-color="#59316b"/>
+                  </linearGradient>
+                </defs>
+                <path d="M62 30 C 60 16, 68 8, 78 8 C 76 20, 69 27, 62 30 Z" fill="#7ed957"/>
+                <path d="M60 30 C 60 18, 53 13, 44 14 C 48 24, 54 29, 60 30 Z" fill="#57b23f"/>
+                <path d="M60 26 C 90 26, 106 56, 98 84 C 92 108, 75 120, 60 120 C 45 120, 28 108, 22 84 C 14 56, 30 26, 60 26 Z" fill="url(#torPurple)"/>
+                <g fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="3.4" stroke-linecap="round">
+                  <path d="M60 44 C 80 46, 90 66, 84 86"/>
+                  <path d="M60 58 C 74 60, 80 74, 76 88"/>
+                  <path d="M60 72 C 68 74, 71 82, 69 90"/>
+                </g>
+              </svg>
+              <span class="th-word">Tor</span>
+            </div>
+            <div class="th-body">
+              <h4>A quick history <span class="th-tag">The Onion Router</span></h4>
+              <p>“Onion routing” wraps data in layers of encryption — peeled one relay at a time, just like an onion.</p>
+              <ul class="th-timeline">
+                <li><b>1990s</b><span>Invented at the U.S. Naval Research Lab to protect intelligence comms.</span></li>
+                <li><b>2002</b><span>First public release of Tor — “The Onion Router.”</span></li>
+                <li><b>2006</b><span>The nonprofit Tor Project forms; now used worldwide for privacy.</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="demo-stage">
+          <div class="browser-live blocked-anim">
+            <div class="chrome tor-chrome">
+              <div class="browser-dots"><i></i><i></i><i></i></div>
+              <div class="url-bar"><span class="onion-ico">🧅</span> <span class="url-type" data-type="http://examplepedia.onion"></span></div>
+            </div>
+            <div class="page-body blocked-ui">
+              <div class="chrome-fail">
+                <div class="fail-icon">✕</div>
+                <h4>Hmm. We’re having trouble finding that site.</h4>
+                <p>Regular browsers can’t resolve <code>.onion</code> addresses.</p>
+              </div>
+              <div class="tor-rescue">
+                <div class="tor-logo">Tor</div>
+                <p>You would need the official Tor Browser to even try.</p>
+              </div>
+            </div>
+            <div class="layer-badge dark">DARK · Special access</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 Dangers -->
+    <section class="slide" data-depth="0.7" data-theme="danger">
+      <div class="slide-inner wide">
+        <p class="eyebrow">Danger zone · animated warnings</p>
+        <h2>What almost gets you</h2>
+        <p class="lede">
+          Fictional but realistic traps. Nothing here is a real marketplace —
+          just teaching patterns so you recognize red flags.
+        </p>
+        <div class="danger-grid">
+          <article class="danger-card scam" style="--i:0">
+            <div class="danger-stage">
+              <div class="fake-site">
+                <div class="fake-top">🎉 FREE CRYPTO AIRDROP</div>
+                <div class="fake-url">free-btc-giveaway.onion</div>
+                <button class="trap-btn" type="button">Claim 2.5 BTC now</button>
+                <div class="cursor-you"></div>
+                <div class="deny-stamp">SCAM</div>
+              </div>
+            </div>
+            <h3>1 · Too-good scam sites</h3>
+            <p>Promise free money → steal wallets or install malware. Your cursor almost clicks — stamp blocks you.</p>
+          </article>
+          <article class="danger-card phish" style="--i:1">
+            <div class="danger-stage">
+              <div class="phish-mail">
+                <div class="phish-from">From: security@northstar-bank-support.onion</div>
+                <p>Urgent! Verify account or it will be locked in 1 hour.</p>
+                <div class="phish-link">→ Verify now</div>
+                <div class="phish-slash"></div>
+              </div>
+            </div>
+            <h3>2 · Phishing “bank” emails</h3>
+            <p>Lookalike names. Real banks don’t ask for passwords via random onion links.</p>
+          </article>
+          <article class="danger-card malware" style="--i:2">
+            <div class="danger-stage">
+              <div class="dl-bait">
+                <div class="file-icon">📄</div>
+                <div class="file-name">exam_answers_2026.exe</div>
+                <div class="progress-hack"><i></i></div>
+                <div class="skull-pop">☠️ Malware</div>
+              </div>
+            </div>
+            <h3>3 · “Free download” bait</h3>
+            <p>Random files = ransomware / stealers. You cancel before the bar finishes.</p>
+          </article>
+          <article class="danger-card data" style="--i:3">
+            <div class="danger-stage">
+              <div class="leak-board">
+                <div class="leak-row blur">you@example.com · pwd****</div>
+                <div class="leak-row blur">card •••• 4281 · CVV</div>
+                <div class="leak-row blur">home address · doxx</div>
+                <div class="shield">🛡️ Don’t feed the market</div>
+              </div>
+            </div>
+            <h3>4 · Stolen data markets</h3>
+            <p>Criminals trade leaked emails &amp; cards. Never upload IDs or selfies to strangers.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 Tor -->
+    <section class="slide" data-depth="0.75" data-theme="dark">
+      <div class="slide-inner wide">
+        <p class="eyebrow">How Tor works · normal search vs Tor</p>
+        <h2>Your traffic takes 3 hops</h2>
+        <div class="map-toggle" role="tablist" aria-label="Compare routing">
+          <button type="button" class="map-tab" data-mode="normal" role="tab">🔍 Normal Google search</button>
+          <button type="button" class="map-tab active" data-mode="tor" role="tab">🧅 Through Tor (3 hops)</button>
+        </div>
+        <div class="tor-map-demo mode-tor" id="torMapDemo">
+          <svg class="world-map" viewBox="0 0 1000 500" role="img" aria-label="World map routing demo">
+            <defs>
+              <linearGradient id="oceanGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#0a2740"/>
+                <stop offset="100%" stop-color="#02090f"/>
+              </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <rect width="1000" height="500" rx="20" fill="url(#oceanGrad)"/>
+            <!-- Latitude/longitude grid -->
+            <g stroke="rgba(120,190,230,0.06)" stroke-width="1">
+              <line x1="0" y1="125" x2="1000" y2="125"/>
+              <line x1="0" y1="250" x2="1000" y2="250"/>
+              <line x1="0" y1="375" x2="1000" y2="375"/>
+              <line x1="250" y1="0" x2="250" y2="500"/>
+              <line x1="500" y1="0" x2="500" y2="500"/>
+              <line x1="750" y1="0" x2="750" y2="500"/>
+            </g>
+            <!-- Recognisable continents -->
+            <g class="lands" fill="#12324a" stroke="#1f4e6e" stroke-width="1.5" stroke-linejoin="round">
+              <!-- North America -->
+              <path d="M120,95 L215,80 L300,100 L318,132 L280,150 L268,180 L292,196 L262,214 L236,206 L232,238 L206,232 L196,198 L172,206 L150,178 L166,150 L138,138 L128,116 Z"/>
+              <!-- Central America -->
+              <path d="M256,214 L286,240 L300,270 L280,268 L262,244 L250,226 Z"/>
+              <!-- South America -->
+              <path d="M300,282 L346,278 L364,312 L352,356 L326,414 L300,440 L288,404 L302,352 L286,314 L292,294 Z"/>
+              <!-- Europe -->
+              <path d="M486,110 L548,100 L572,116 L560,140 L590,150 L566,168 L520,166 L500,150 L484,158 L474,134 Z"/>
+              <!-- Africa -->
+              <path d="M500,178 L590,176 L612,214 L596,270 L560,330 L528,372 L508,344 L512,286 L490,236 L494,202 Z"/>
+              <!-- Asia -->
+              <path d="M576,96 L720,72 L840,88 L892,120 L858,150 L788,158 L742,146 L700,168 L648,176 L612,158 L584,132 Z"/>
+              <!-- India -->
+              <path d="M648,176 L690,176 L704,206 L676,244 L656,214 L646,192 Z"/>
+              <!-- Australia -->
+              <path d="M800,346 L888,338 L912,376 L878,414 L812,408 L788,378 Z"/>
+            </g>
+
+            <!-- ============ NORMAL SEARCH ROUTE ============ -->
+            <g class="route route-normal">
+              <path class="route-line direct"
+                d="M190,210 L780,150"
+                fill="none" stroke="#5dffb0" stroke-width="3" stroke-linecap="round"
+                filter="url(#glow)"/>
+              <circle class="pkt pkt-normal" r="7" fill="#eafff5" filter="url(#glow)">
+                <animateMotion dur="1.6s" repeatCount="indefinite" path="M190,210 L780,150"/>
+              </circle>
+            </g>
+
+            <!-- ============ TOR ROUTE ============ -->
+            <g class="route route-tor">
+              <path class="route-line"
+                d="M190,210 L505,130 L735,120 L320,395 L780,150"
+                fill="none" stroke="#3ecbff" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round" filter="url(#glow)"/>
+              <circle class="pkt pkt-tor" r="7" fill="#e8fbff" filter="url(#glow)">
+                <animateMotion dur="6s" repeatCount="indefinite"
+                  path="M190,210 L505,130 L735,120 L320,395 L780,150"/>
+              </circle>
+              <!-- relay nodes -->
+              <g class="map-node relay-node" transform="translate(505 130)">
+                <circle r="11" class="node-ring"/><circle r="5" class="node-core"/>
+                <text y="-18" text-anchor="middle">1 · Entry</text>
+                <text class="sub" y="30" text-anchor="middle">Europe</text>
+              </g>
+              <g class="map-node relay-node" transform="translate(735 120)">
+                <circle r="11" class="node-ring"/><circle r="5" class="node-core"/>
+                <text y="-18" text-anchor="middle">2 · Middle</text>
+                <text class="sub" y="30" text-anchor="middle">Asia</text>
+              </g>
+              <g class="map-node relay-node" transform="translate(320 395)">
+                <circle r="11" class="node-ring"/><circle r="5" class="node-core"/>
+                <text y="-18" text-anchor="middle">3 · Exit</text>
+                <text class="sub" y="30" text-anchor="middle">S. America</text>
+              </g>
+            </g>
+
+            <!-- endpoints (shared) -->
+            <g class="map-node n-you" transform="translate(190 210)">
+              <circle r="12" class="node-ring you"/><circle r="6" class="node-core you"/>
+              <text y="-20" text-anchor="middle">You</text>
+              <text class="sub" y="32" text-anchor="middle">Home · N. America</text>
+            </g>
+            <g class="map-node n-site" transform="translate(780 150)">
+              <circle r="12" class="node-ring site"/><circle r="6" class="node-core site"/>
+              <text y="-20" text-anchor="middle">🌐 Website</text>
+              <text class="sub" y="32" text-anchor="middle">Server</text>
+            </g>
+          </svg>
+
+          <div class="map-extras">
+          <div class="onion-peel" id="onionPeel">
+            <div class="onion-stack" aria-hidden="true">
+              <div class="o-layer o1"><span>1</span></div>
+              <div class="o-layer o2"><span>2</span></div>
+              <div class="o-layer o3"><span>3</span></div>
+              <div class="o-core">✉</div>
+            </div>
+            <div class="peel-caption">
+              <strong id="peelTitle">Wrapped in 3 layers 🧅</strong>
+              <p id="peelText">Your request is encrypted like an onion — each relay peels just one layer.</p>
+              <div class="peel-steps">
+                <span class="pstep" data-s="1"><b>Entry</b> peels layer 1</span>
+                <span class="pstep" data-s="2"><b>Middle</b> peels layer 2</span>
+                <span class="pstep" data-s="3"><b>Exit</b> peels layer 3 → message</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="compare-strip">
+            <div class="cmp cmp-normal">
+              <span class="cmp-title">🔍 Normal search</span>
+              <span class="cmp-row"><b>1</b> direct hop</span>
+              <span class="cmp-row fast">⚡ Fast</span>
+              <span class="cmp-row warn">👁 Site + ISP see your IP</span>
+            </div>
+            <div class="cmp cmp-tor">
+              <span class="cmp-title">🧅 Through Tor</span>
+              <span class="cmp-row"><b>3</b> relay hops</span>
+              <span class="cmp-row slow">🐢 Slower by design</span>
+              <span class="cmp-row ok">🛡 No hop sees the full path</span>
+            </div>
+          </div>
+          </div>
+        </div>
+        <div class="pill-row">
+          <span class="pill">Official source: torproject.org</span>
+          <span class="pill">Open source</span>
+          <span class="pill">Laws still apply</span>
+          <span class="pill">Mistakes can unmask you</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 Good vs bad -->
+    <section class="slide" data-depth="0.68" data-theme="dark">
+      <div class="slide-inner wide">
+        <p class="eyebrow">Two doors · live choice</p>
+        <h2>You compare uses</h2>
+        <p class="lede short">Same tool, two outcomes. Hover, tap, or focus a door — the meter tips.</p>
+        <div class="door-demo" id="doorDemo">
+          <button type="button" class="door good">
+            <div class="door-panel">
+              <span class="door-knob"></span>
+              <div class="door-inner">
+                <span class="badge-ok">SAFE PATTERN</span>
+                <h4>SecureDrop-style tips</h4>
+                <p>Journalists receive whistleblower tips privately.</p>
+                <ul>
+                  <li>Reporters &amp; activists</li>
+                  <li>Anonymity research</li>
+                  <li>Risky speech regions</li>
+                </ul>
+              </div>
+            </div>
+            <span class="door-label">✓ Lawful privacy</span>
+          </button>
+          <div class="scale-orb" id="scaleOrb">
+            <div class="scale-dial">
+              <span class="scale-tick good">GOOD</span>
+              <span class="scale-tick bad">BAD</span>
+              <div class="scale-needle"></div>
+              <div class="scale-hub"></div>
+            </div>
+            <span class="scale-verdict" id="scaleVerdict">Pick a door →</span>
+          </div>
+          <button type="button" class="door bad">
+            <div class="door-panel">
+              <span class="door-knob"></span>
+              <div class="door-inner">
+                <span class="badge-bad">DANGER PATTERN</span>
+                <h4>Illegal markets &amp; scams</h4>
+                <p>Stolen accounts, malware, fraud — still crimes.</p>
+                <ul>
+                  <li>Illegal goods</li>
+                  <li>Stolen personal data</li>
+                  <li>Malware / fraud</li>
+                </ul>
+                <div class="siren"></div>
+              </div>
+            </div>
+            <span class="door-label">✕ Harmful misuse</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 Myths -->
+    <section class="slide" data-depth="0.5" data-theme="deep">
+      <div class="slide-inner wide">
+        <p class="eyebrow">Clear the fog · tap to flip</p>
+        <h2>Myths vs reality</h2>
+        <div class="myth-grid">
+          <button type="button" class="myth-card" style="--i:0" aria-label="Flip myth card 1">
+            <div class="myth-face myth-front">
+              <h3>❌ Myth</h3>
+              <p>“Dark Web = all crime.”</p>
+              <span class="flip-hint">Tap to reveal reality →</span>
+            </div>
+            <div class="myth-face myth-back">
+              <h3 class="ok">✓ Reality</h3>
+              <p>Also privacy tools for journalism &amp; research. Crime is a misuse — not the whole map.</p>
+              <span class="flip-hint">← Tap to flip back</span>
+            </div>
+          </button>
+          <button type="button" class="myth-card" style="--i:1" aria-label="Flip myth card 2">
+            <div class="myth-face myth-front">
+              <h3>❌ Myth</h3>
+              <p>“My Gmail is Dark Web.”</p>
+              <span class="flip-hint">Tap to reveal reality →</span>
+            </div>
+            <div class="myth-face myth-back">
+              <h3 class="ok">✓ Reality</h3>
+              <p>Gmail is Deep Web. Dark Web needs special access like Tor + .onion.</p>
+              <span class="flip-hint">← Tap to flip back</span>
+            </div>
+          </button>
+          <button type="button" class="myth-card" style="--i:2" aria-label="Flip myth card 3">
+            <div class="myth-face myth-front">
+              <h3>❌ Myth</h3>
+              <p>“Tor = invisible forever.”</p>
+              <span class="flip-hint">Tap to reveal reality →</span>
+            </div>
+            <div class="myth-face myth-back">
+              <h3 class="ok">✓ Reality</h3>
+              <p>Helps a lot — but logins, downloads, and bad habits can still expose you.</p>
+              <span class="flip-hint">← Tap to flip back</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 Safety -->
+    <section class="slide" data-depth="0.82" data-theme="dark">
+      <div class="slide-inner wide">
+        <p class="eyebrow">Your safety checklist</p>
+        <h2>Stay smart</h2>
+        <div class="safety-layout">
+          <div class="shield-demo" aria-hidden="true">
+            <div class="shield-core">
+              <div class="shield-ring"></div>
+              <div class="shield-ring delay"></div>
+              <div class="shield-icon">🛡️</div>
+            </div>
+            <div class="threat-feed" id="threatFeed"></div>
+            <p class="shield-score"><span id="blocksCount">0</span> threats blocked</p>
+          </div>
+          <div class="rules-3d checklist" id="safetyChecklist">
+            <label class="rule check" style="--i:0"><input type="checkbox" /><span>01</span><p>Learn the map first — no need to visit risky places to understand them.</p></label>
+            <label class="rule check" style="--i:1"><input type="checkbox" /><span>02</span><p>Never share passwords, IDs, or selfies with strangers online.</p></label>
+            <label class="rule check" style="--i:2"><input type="checkbox" /><span>03</span><p>Don’t download random .exe / “free answers” files.</p></label>
+            <label class="rule check" style="--i:3"><input type="checkbox" /><span>04</span><p>Illegal stays illegal — Tor doesn’t grant immunity.</p></label>
+            <label class="rule check" style="--i:4"><input type="checkbox" /><span>05</span><p>If trying Tor someday: only from <strong>torproject.org</strong>.</p></label>
+            <p class="check-progress" id="checkProgress">0 / 5 checked — tick each as you learn it</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 Quiz -->
+    <section class="slide quiz-slide" data-depth="0.92" data-theme="abyss">
+      <div class="slide-inner wide">
+        <p class="eyebrow">Your depth check</p>
+        <h2>Quiz Time !</h2>
+        <p class="lede">5 questions about your dive. Pick answers, then see your score.</p>
+        <div id="quiz" class="quiz">
+          <div class="quiz-progress"><div id="quizBar"></div></div>
+          <div id="quizCard" class="quiz-card"></div>
+          <div id="quizResult" class="quiz-result hidden"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav-controls" aria-label="Presentation controls">
+    <button class="nav-btn" id="prevBtn" aria-label="Previous slide">←</button>
+    <div class="dots" id="dots"></div>
+    <button class="nav-btn" id="nextBtn" aria-label="Next slide">→</button>
+  </nav>
+
+  <div class="depth-readout" id="depthReadout">
+    <span class="depth-value">0m</span>
+    <span class="depth-zone">SURFACE</span>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="app.js?v=20260825h"></script>
+</body>
+</html>
