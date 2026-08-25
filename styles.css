@@ -3364,3 +3364,70 @@ body[data-theme="danger"] .fog-overlay {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/*  Performance / Lite mode                                                    */
+/* -------------------------------------------------------------------------- */
+
+.perf-toggle {
+  position: fixed;
+  left: 1.25rem;
+  bottom: 1.5rem;
+  z-index: 25;
+  padding: 0.5rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: rgba(8, 24, 42, 0.7);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.perf-toggle:hover {
+  color: var(--text);
+  border-color: var(--cyan);
+}
+
+.perf-toggle.on {
+  color: var(--ok);
+  border-color: rgba(93, 255, 176, 0.5);
+  background: rgba(12, 40, 30, 0.7);
+}
+
+@media (max-width: 640px) {
+  .perf-toggle {
+    bottom: 0.75rem;
+    left: 0.75rem;
+    font-size: 0.65rem;
+    padding: 0.4rem 0.65rem;
+  }
+}
+
+/* Lite mode: the biggest per-frame cost on weak GPUs is re-blurring the glass
+   panels over the live WebGL canvas. Drop all backdrop blur, thicken the glass
+   so text stays readable, and disable the constantly-repainting scanlines and
+   the blur-based hero glitch. */
+body.perf-lite {
+  --glass: rgba(8, 24, 42, 0.9);
+}
+
+body.perf-lite *,
+body.perf-lite *::before,
+body.perf-lite *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body.perf-lite .scanlines {
+  display: none;
+}
+
+body.perf-lite .glitch.glitching {
+  filter: none !important;
+}
