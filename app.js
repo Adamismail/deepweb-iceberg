@@ -22,6 +22,68 @@ let animDepth = 0;
 let targetDepth = 0;
 let reducingMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/* -------------------------------------------------------------------------- */
+/*  Performance tier — auto-detect weak GPUs / VDI, allow manual override      */
+/* -------------------------------------------------------------------------- */
+/* The scene is heavy (glass transmission passes, per-frame ocean normals, and */
+/* backdrop-filter blur composited over a live canvas). That's fine on a fast  */
+/* GPU but crawls on low-power / virtual displays. "Lite" mode swaps in cheaper */
+/* materials, drops the pixel ratio, freezes the ocean wave, and disables the   */
+/* CSS blur — keeping the experience smooth on modest hardware.                 */
+
+const params = new URLSearchParams(location.search);
+
+function readStoredPerf() {
+  try {
+    return localStorage.getItem("perfMode");
+  } catch {
+    return null;
+  }
+}
+
+function detectLowEndDevice() {
+  // Respect explicit user/URL choices first.
+  if (params.has("lite") || params.get("perf") === "low") return true;
+  if (params.get("perf") === "high") return false;
+  const stored = readStoredPerf();
+  if (stored === "lite") return true;
+  if (stored === "high") return false;
+
+  if (reducingMotion) return true;
+  if (navigator.connection?.saveData) return true;
+
+  // Only trust these when the browser actually reports them (Safari omits
+  // deviceMemory, so we must not assume "low" from a missing value — that would
+  // wrongly downgrade capable Macs). Keep the bar low to avoid false positives;
+  // the runtime FPS monitor is the real safety net for weak/VDI GPUs.
+  if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2) return true;
+  if (navigator.deviceMemory && navigator.deviceMemory <= 2) return true;
+
+  // Sniff the GPU string — software renderers and virtual GPUs (common on VDI)
+  // can't keep up with the transmission/blur workload.
+  try {
+    const gl =
+      document.createElement("canvas").getContext("webgl") ||
+      document.createElement("canvas").getContext("experimental-webgl");
+    if (gl) {
+      const ext = gl.getExtension("WEBGL_debug_renderer_info");
+      const r = ext ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)) : "";
+      if (/swiftshader|llvmpipe|software|basic render|virtualbox|vmware|virgl|microsoft basic|paravirtual/i.test(r)) {
+        return true;
+      }
+    }
+  } catch {
+    /* ignore — fall through to default */
+  }
+
+  return false;
+}
+
+// Whether the user explicitly picked a tier (disables auto-downgrade heuristics).
+let perfUserChoice = params.has("lite") || params.has("perf") || readStoredPerf() != null;
+let perfLite = detectLowEndDevice();
+document.body.classList.toggle("perf-lite", perfLite);
+
 slideTotal.textContent = String(slides.length).padStart(2, "0");
 
 slides.forEach((_, i) => {
@@ -580,11 +642,16 @@ renderQuestion();
 const canvas = document.getElementById("scene");
 const renderer = new THREE.WebGLRenderer({
   canvas,
-  antialias: !reducingMotion,
+  // Antialias is fixed at creation time; skip it on low-end/lite for a big win.
+  antialias: !reducingMotion && !perfLite,
   alpha: true,
-  powerPreference: "high-performance",
+  powerPreference: perfLite ? "low-power" : "high-performance",
 });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, reducingMotion ? 1 : 1.75));
+
+function pixelRatioFor(lite) {
+  return Math.min(window.devicePixelRatio, lite || reducingMotion ? 1 : 1.75);
+}
+renderer.setPixelRatio(pixelRatioFor(perfLite));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0x020814, 1);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -616,8 +683,9 @@ const abyssLight = new THREE.PointLight(0x1a6a9a, 1.2, 40);
 abyssLight.position.set(0, -8, 2);
 scene.add(abyssLight);
 
-/* Ocean plane */
-const oceanGeo = new THREE.PlaneGeometry(80, 80, 64, 64);
+/* Ocean plane — fewer segments in lite mode (the wave loop scales with them) */
+const oceanSegments = perfLite ? 24 : 64;
+const oceanGeo = new THREE.PlaneGeometry(80, 80, oceanSegments, oceanSegments);
 const oceanMat = new THREE.MeshStandardMaterial({
   color: 0x0a3048,
   metalness: 0.2,
@@ -634,7 +702,18 @@ scene.add(ocean);
 const iceberg = new THREE.Group();
 scene.add(iceberg);
 
-function iceMaterial(opts = {}) {
+function iceMaterial(opts = {}, lite = perfLite) {
+  // Lite: MeshStandardMaterial has no transmission pass, so the whole scene
+  // isn't re-rendered into an offscreen buffer every frame. Still reads as ice.
+  if (lite) {
+    return new THREE.MeshStandardMaterial({
+      color: opts.color ?? 0xc9f0ff,
+      metalness: 0.0,
+      roughness: 0.45,
+      transparent: true,
+      opacity: Math.min(1, (opts.opacity ?? 0.92) + 0.04),
+    });
+  }
   return new THREE.MeshPhysicalMaterial({
     color: opts.color ?? 0xc9f0ff,
     metalness: 0.05,
@@ -648,6 +727,20 @@ function iceMaterial(opts = {}) {
     clearcoatRoughness: 0.25,
     envMapIntensity: 1,
   });
+}
+
+const ICE_MAT_SPECS = {
+  tip: { color: 0xe8fbff, transmission: 0.45, opacity: 0.95 },
+  body: { color: 0x9fd8ef, transmission: 0.28, opacity: 0.9 },
+  deep: { color: 0x4a8eae, transmission: 0.15, opacity: 0.88, thickness: 2.2 },
+};
+
+function buildIceMaterials(lite) {
+  return {
+    tip: iceMaterial(ICE_MAT_SPECS.tip, lite),
+    body: iceMaterial(ICE_MAT_SPECS.body, lite),
+    deep: iceMaterial(ICE_MAT_SPECS.deep, lite),
+  };
 }
 
 function makeCraggyMesh(radius, detail, stretchY, mat) {
@@ -667,28 +760,21 @@ function makeCraggyMesh(radius, detail, stretchY, mat) {
   return new THREE.Mesh(geo, mat);
 }
 
-const tipMat = iceMaterial({ color: 0xe8fbff, transmission: 0.45, opacity: 0.95 });
-const bodyMat = iceMaterial({ color: 0x9fd8ef, transmission: 0.28, opacity: 0.9 });
-const deepMat = iceMaterial({
-  color: 0x4a8eae,
-  transmission: 0.15,
-  opacity: 0.88,
-  thickness: 2.2,
-});
+let iceMats = buildIceMaterials(perfLite);
 
-const tip = makeCraggyMesh(1.35, 2, 1.35, tipMat);
+const tip = makeCraggyMesh(1.35, 2, 1.35, iceMats.tip);
 tip.position.y = 1.55;
 iceberg.add(tip);
 
-const mid = makeCraggyMesh(2.4, 2, 0.85, bodyMat);
+const mid = makeCraggyMesh(2.4, 2, 0.85, iceMats.body);
 mid.position.y = -0.2;
 iceberg.add(mid);
 
-const base = makeCraggyMesh(3.3, 1, 1.1, deepMat);
+const base = makeCraggyMesh(3.3, 1, 1.1, iceMats.deep);
 base.position.y = -3.4;
 iceberg.add(base);
 
-const keel = makeCraggyMesh(2.1, 1, 1.4, deepMat);
+const keel = makeCraggyMesh(2.1, 1, 1.4, iceMats.deep);
 keel.position.y = -6.2;
 keel.scale.set(0.85, 1, 0.85);
 iceberg.add(keel);
@@ -706,7 +792,7 @@ waterline.position.y = 0.02;
 iceberg.add(waterline);
 
 /* Bubbles / particles */
-const particleCount = reducingMotion ? 80 : 220;
+const particleCount = reducingMotion || perfLite ? 80 : 220;
 const pGeo = new THREE.BufferGeometry();
 const pPos = new Float32Array(particleCount * 3);
 const pSpeed = new Float32Array(particleCount);
@@ -744,7 +830,7 @@ caustic.position.y = -9;
 scene.add(caustic);
 
 /* Stars / snow above surface */
-const starCount = reducingMotion ? 40 : 120;
+const starCount = reducingMotion || perfLite ? 40 : 120;
 const sGeo = new THREE.BufferGeometry();
 const sPos = new Float32Array(starCount * 3);
 for (let i = 0; i < starCount; i++) {
@@ -772,6 +858,79 @@ function onResize() {
   renderer.setSize(w, h);
 }
 window.addEventListener("resize", onResize);
+
+/* -------------------------------------------------------------------------- */
+/*  Quality switching (manual toggle + automatic FPS-based downgrade)          */
+/* -------------------------------------------------------------------------- */
+
+const perfToggle = document.getElementById("perfToggle");
+
+function updatePerfButton() {
+  if (!perfToggle) return;
+  perfToggle.setAttribute("aria-pressed", String(perfLite));
+  perfToggle.classList.toggle("on", perfLite);
+  perfToggle.textContent = perfLite ? "Lite mode: on" : "Lite mode: off";
+}
+
+function applyQuality(lite, { persist = true } = {}) {
+  if (lite === perfLite) {
+    updatePerfButton();
+    return;
+  }
+  perfLite = lite;
+  document.body.classList.toggle("perf-lite", lite);
+  renderer.setPixelRatio(pixelRatioFor(lite));
+
+  // Swap the iceberg materials (transmission on/off is the big GPU lever).
+  const next = buildIceMaterials(lite);
+  [tip.material, mid.material, base.material, keel.material].forEach((m) => {
+    if (m && m !== next.tip && m !== next.body && m !== next.deep) m.dispose();
+  });
+  iceMats = next;
+  tip.material = next.tip;
+  mid.material = next.body;
+  base.material = next.deep;
+  keel.material = next.deep;
+
+  if (persist) {
+    try {
+      localStorage.setItem("perfMode", lite ? "lite" : "high");
+    } catch {
+      /* storage unavailable — ignore */
+    }
+  }
+  updatePerfButton();
+}
+
+if (perfToggle) {
+  perfToggle.addEventListener("click", () => {
+    perfUserChoice = true;
+    applyQuality(!perfLite, { persist: true });
+  });
+}
+updatePerfButton();
+
+// Auto-downgrade: if we sustain a low frame rate in high mode (and the user
+// hasn't chosen a tier), quietly drop to lite so the dive stays smooth.
+let fpsFrames = 0;
+let fpsWindowStart = performance.now();
+let lowFpsStreak = 0;
+
+function trackFps(now) {
+  fpsFrames += 1;
+  const elapsed = now - fpsWindowStart;
+  if (elapsed < 1000) return;
+  const fps = (fpsFrames * 1000) / elapsed;
+  fpsFrames = 0;
+  fpsWindowStart = now;
+  if (perfLite || perfUserChoice) return;
+  if (fps < 24) {
+    lowFpsStreak += 1;
+    if (lowFpsStreak >= 3) applyQuality(true, { persist: false });
+  } else {
+    lowFpsStreak = 0;
+  }
+}
 
 const clock = new THREE.Clock();
 let pointerX = 0;
@@ -816,8 +975,9 @@ function animate() {
     1
   );
 
-  // Gentle ocean vertex wave
-  if (!reducingMotion) {
+  // Gentle ocean vertex wave — the per-vertex loop + normal recompute is the
+  // single most expensive CPU cost per frame, so it's frozen in lite mode.
+  if (!reducingMotion && !perfLite) {
     const pos = ocean.geometry.attributes.position;
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
@@ -849,6 +1009,7 @@ function animate() {
   depthValue.textContent = `${metersFor(animDepth)}m`;
 
   renderer.render(scene, camera);
+  trackFps(performance.now());
 }
 
 animate();
