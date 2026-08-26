@@ -518,15 +518,15 @@ const QUESTIONS = [
     explain: "Dark Web hidden services usually need Tor (or similar) — normal browsers fail.",
   },
   {
-    q: "Which trap almost got you in the danger animations?",
+    q: "Which of these is a scam you should NOT click?",
     options: [
-      "A free crypto airdrop button",
+      "“Free crypto — claim 2.5 BTC now!”",
       "A Wikipedia article",
       "Your StreamFlix homepage",
-      "Campus tuition email",
+      "Your school’s tuition email",
     ],
     answer: 0,
-    explain: "Too-good-to-be-true giveaways are classic scam bait — stamp blocked the click.",
+    explain: "“Free money” pop-ups are classic bait. The other three are normal, safe pages.",
   },
   {
     q: "Your big takeaway about Tor is…",
@@ -601,6 +601,127 @@ function pick(i) {
   actions.appendChild(next);
 }
 
+function fireConfetti() {
+  // Respect low-power / reduced-motion: skip the heavy burst.
+  if (reducingMotion) return;
+  const layer = document.createElement("div");
+  layer.className = "confetti-layer";
+  document.body.appendChild(layer);
+
+  const colors = ["#3ecbff", "#5dffb0", "#ffb454", "#e8fbff", "#b57fda", "#ff6b8b"];
+  const count = perfLite ? 60 : 140;
+  const w = window.innerWidth;
+
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement("i");
+    const size = 6 + Math.random() * 8;
+    piece.style.left = `${Math.random() * w}px`;
+    piece.style.width = `${size}px`;
+    piece.style.height = `${size * (0.4 + Math.random() * 0.6)}px`;
+    piece.style.background = colors[(Math.random() * colors.length) | 0];
+    if (Math.random() > 0.6) piece.style.borderRadius = "50%";
+    layer.appendChild(piece);
+
+    const driftX = (Math.random() - 0.5) * 260;
+    const spin = (Math.random() > 0.5 ? 1 : -1) * (360 + Math.random() * 720);
+    const fall = window.innerHeight + 140;
+    const dur = 2600 + Math.random() * 2200;
+
+    piece.animate(
+      [
+        { transform: `translate(0, -40px) rotate(0deg)`, opacity: 1 },
+        { transform: `translate(${driftX}px, ${fall}px) rotate(${spin}deg)`, opacity: 0.9 },
+      ],
+      {
+        duration: dur,
+        delay: Math.random() * 400,
+        easing: "cubic-bezier(0.2, 0.6, 0.4, 1)",
+        fill: "forwards",
+      }
+    );
+  }
+
+  setTimeout(() => layer.remove(), 5400);
+}
+
+function drawCertificate(canvasEl, { name, title, score, total, dateStr }) {
+  const ctx = canvasEl.getContext("2d");
+  const W = canvasEl.width;
+  const H = canvasEl.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, "#03121f");
+  bg.addColorStop(1, "#071b2f");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Borders
+  ctx.strokeStyle = "rgba(62,203,255,0.75)";
+  ctx.lineWidth = 8;
+  ctx.strokeRect(34, 34, W - 68, H - 68);
+  ctx.strokeStyle = "rgba(168,232,255,0.35)";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(54, 54, W - 108, H - 108);
+
+  const cx = W / 2;
+  ctx.textAlign = "center";
+
+  ctx.fillStyle = "#8bb0c8";
+  ctx.font = "600 34px 'Outfit', system-ui, sans-serif";
+  ctx.fillText("🧊  WEB ICEBERG ACADEMY", cx, 150);
+
+  ctx.fillStyle = "#e8fbff";
+  ctx.font = "72px 'Bebas Neue', Impact, sans-serif";
+  ctx.fillText("CERTIFICATE OF COMPLETION", cx, 250);
+
+  ctx.fillStyle = "#8bb0c8";
+  ctx.font = "300 30px 'Outfit', system-ui, sans-serif";
+  ctx.fillText("This certifies that", cx, 340);
+
+  ctx.fillStyle = "#3ecbff";
+  ctx.font = "88px 'Bebas Neue', Impact, sans-serif";
+  ctx.fillText(name || "Explorer", cx, 450);
+
+  // underline under the name
+  const nameW = Math.min(W - 240, Math.max(320, ctx.measureText(name || "Explorer").width + 120));
+  ctx.strokeStyle = "rgba(93,255,176,0.6)";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(cx - nameW / 2, 480);
+  ctx.lineTo(cx + nameW / 2, 480);
+  ctx.stroke();
+
+  ctx.fillStyle = "#e7f6ff";
+  ctx.font = "400 32px 'Outfit', system-ui, sans-serif";
+  ctx.fillText("has completed the basics of the", cx, 560);
+  ctx.fillStyle = "#5dffb0";
+  ctx.font = "600 40px 'Outfit', system-ui, sans-serif";
+  ctx.fillText("Surface Web · Deep Web · Dark Web", cx, 620);
+
+  ctx.fillStyle = "#ffb454";
+  ctx.font = "600 34px 'Outfit', system-ui, sans-serif";
+  ctx.fillText(`Rank: ${title}  ·  Score ${score}/${total}`, cx, 710);
+
+  // Footer: date + signature
+  ctx.fillStyle = "#8bb0c8";
+  ctx.font = "300 26px 'Outfit', system-ui, sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText(`Date: ${dateStr}`, 120, H - 110);
+  ctx.textAlign = "right";
+  ctx.fillText("The Web Iceberg", W - 120, H - 150);
+  ctx.strokeStyle = "rgba(168,232,255,0.5)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(W - 380, H - 120);
+  ctx.lineTo(W - 120, H - 120);
+  ctx.stroke();
+  ctx.fillStyle = "#8bb0c8";
+  ctx.font = "300 22px 'Outfit', system-ui, sans-serif";
+  ctx.fillText("Signature", W - 120, H - 90);
+}
+
 function showResults() {
   quizBar.style.width = "100%";
   quizCard.classList.add("hidden");
@@ -617,12 +738,73 @@ function showResults() {
     blurb = "Solid grasp of your inbox, bank, and why .onion needs Tor.";
   }
 
+  const dateStr = new Date().toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   quizResult.innerHTML = `
     <div class="score-ring" style="--score:${pct}"><strong>${score}/${QUESTIONS.length}</strong></div>
     <h3>${title}</h3>
     <p>${blurb}</p>
-    <button class="btn primary" type="button" id="retryQuiz">Try quiz again</button>
+
+    <div class="certificate" id="certificate">
+      <div class="cert-glow" aria-hidden="true"></div>
+      <div class="cert-seal" aria-hidden="true">🧊</div>
+      <span class="cert-kicker">Web Iceberg Academy</span>
+      <h4 class="cert-title">Certificate of Completion</h4>
+      <p class="cert-sub">This certifies that</p>
+      <span class="cert-name" id="certName">Explorer</span>
+      <p class="cert-body">
+        has completed the basics of the
+        <strong>Surface Web · Deep Web · Dark Web</strong>
+      </p>
+      <div class="cert-meta">
+        <span>Rank · <b>${title}</b></span>
+        <span>Score · <b>${score}/${QUESTIONS.length}</b></span>
+        <span>${dateStr}</span>
+      </div>
+    </div>
+
+    <div class="cert-controls">
+      <input type="text" id="certNameInput" class="cert-input" maxlength="28"
+        placeholder="Type your name for the certificate" aria-label="Your name" />
+      <button class="btn primary" type="button" id="downloadCert">⬇ Download certificate</button>
+    </div>
+
+    <button class="btn ghost" type="button" id="retryQuiz">Try quiz again</button>
   `;
+
+  const certNameEl = document.getElementById("certName");
+  const nameInput = document.getElementById("certNameInput");
+  nameInput.addEventListener("input", () => {
+    certNameEl.textContent = nameInput.value.trim() || "Explorer";
+  });
+
+  document.getElementById("downloadCert").addEventListener("click", async () => {
+    const name = (nameInput.value.trim() || "Explorer").slice(0, 28);
+    const canvasEl = document.createElement("canvas");
+    canvasEl.width = 1600;
+    canvasEl.height = 1100;
+    try {
+      if (document.fonts?.ready) await document.fonts.ready;
+    } catch {
+      /* fonts API unavailable — draw with fallbacks */
+    }
+    drawCertificate(canvasEl, {
+      name,
+      title,
+      score,
+      total: QUESTIONS.length,
+      dateStr,
+    });
+    const link = document.createElement("a");
+    link.download = `web-iceberg-certificate-${name.replace(/\s+/g, "-").toLowerCase()}.png`;
+    link.href = canvasEl.toDataURL("image/png");
+    link.click();
+  });
+
   document.getElementById("retryQuiz").addEventListener("click", () => {
     score = 0;
     qIndex = 0;
@@ -631,6 +813,9 @@ function showResults() {
     quizCard.classList.remove("hidden");
     renderQuestion();
   });
+
+  // Celebrate! (skipped automatically for reduced-motion)
+  fireConfetti();
 }
 
 renderQuestion();
