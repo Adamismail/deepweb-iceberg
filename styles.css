@@ -1135,6 +1135,169 @@ code {
   line-height: 1.5;
 }
 
+.btn.ghost {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+}
+
+.btn.ghost:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: rgba(62, 203, 255, 0.15);
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Completion certificate                                                     */
+/* -------------------------------------------------------------------------- */
+
+.certificate {
+  position: relative;
+  overflow: hidden;
+  max-width: 560px;
+  margin: 0.5rem auto 1.5rem;
+  padding: 1.9rem 1.6rem 1.6rem;
+  border-radius: 1.2rem;
+  border: 1px solid rgba(62, 203, 255, 0.5);
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(62, 203, 255, 0.16), transparent 60%),
+    linear-gradient(160deg, #03121f 0%, #071b2f 100%);
+  box-shadow: 0 20px 60px rgba(2, 12, 24, 0.6), inset 0 0 0 1px rgba(168, 232, 255, 0.12);
+  text-align: center;
+  animation: certRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cert-glow {
+  position: absolute;
+  inset: -40% -40% auto -40%;
+  height: 80%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(93, 255, 176, 0.18), transparent 70%);
+  pointer-events: none;
+}
+
+.cert-seal {
+  font-size: 2.2rem;
+  line-height: 1;
+  margin-bottom: 0.35rem;
+  filter: drop-shadow(0 4px 12px rgba(62, 203, 255, 0.5));
+}
+
+.cert-kicker {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.cert-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  letter-spacing: 0.05em;
+  color: var(--ice-bright);
+  margin-bottom: 0.75rem;
+}
+
+.cert-sub {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.cert-name {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  letter-spacing: 0.04em;
+  color: var(--cyan);
+  padding: 0 0.5rem 0.15rem;
+  border-bottom: 2px solid rgba(93, 255, 176, 0.55);
+  margin-bottom: 0.75rem;
+  min-width: 180px;
+  word-break: break-word;
+}
+
+.cert-body {
+  color: var(--text);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.cert-body strong {
+  display: block;
+  color: var(--ok);
+  font-size: 1.05rem;
+  margin-top: 0.2rem;
+}
+
+.cert-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.25rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  border-top: 1px solid rgba(168, 232, 255, 0.14);
+  padding-top: 0.85rem;
+}
+
+.cert-meta b {
+  color: var(--warn);
+}
+
+.cert-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.cert-input {
+  flex: 1 1 240px;
+  max-width: 320px;
+  padding: 0.8rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+
+.cert-input:focus {
+  outline: none;
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(62, 203, 255, 0.2);
+}
+
+.cert-input::placeholder {
+  color: var(--muted);
+}
+
+@keyframes certRise {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Confetti popper burst on the results screen */
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti-layer i {
+  position: absolute;
+  top: -40px;
+  border-radius: 2px;
+  will-change: transform, opacity;
+}
+
 .nav-controls {
   position: fixed;
   bottom: 1.4rem;
